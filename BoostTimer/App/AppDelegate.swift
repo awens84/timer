@@ -37,6 +37,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             guard let size = notification.userInfo?["size"] as? NSSize else { return }
             self?.resizePanel(to: size)
         }
+
+        // Listen for opacity changes from Settings
+        NotificationCenter.default.addObserver(
+            forName: .panelOpacityChanged,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let opacity = notification.userInfo?["opacity"] as? Double else { return }
+            self?.panel.animator().alphaValue = CGFloat(opacity)
+        }
+
+        // Apply saved opacity on launch
+        let savedOpacity = UserDefaults.standard.double(forKey: "panelOpacity")
+        panel.alphaValue = savedOpacity > 0 ? CGFloat(savedOpacity) : 0.85
     }
 
     // MARK: - Status Bar

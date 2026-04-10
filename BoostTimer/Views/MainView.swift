@@ -4,6 +4,7 @@ import SwiftUI
 
 extension Notification.Name {
     static let panelResize = Notification.Name("com.boosttimer.panelResize")
+    static let panelOpacityChanged = Notification.Name("com.boosttimer.panelOpacityChanged")
 }
 
 // MARK: - Expanded Screen
@@ -231,12 +232,12 @@ struct MainView: View {
             if viewModel.isExpanded {
                 switch viewModel.expandedScreen {
                 case .list:
-                    let h = max(130, viewModel.timers.count * 70 + 70)
-                    size = NSSize(width: 250, height: min(CGFloat(h), 350))
+                    let h = max(140, viewModel.timers.count * 80 + 80)
+                    size = NSSize(width: 250, height: min(CGFloat(h), 380))
                 case .addTimer:
                     size = NSSize(width: 250, height: 340)
                 case .settings:
-                    size = NSSize(width: 250, height: 400)
+                    size = NSSize(width: 250, height: 460)
                 }
             } else {
                 if viewModel.timers.isEmpty {

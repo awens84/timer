@@ -4,6 +4,7 @@ struct SettingsSheet: View {
     var onDismiss: () -> Void
 
     @AppStorage("isDarkMode") private var isDarkMode = true
+    @AppStorage("panelOpacity") private var panelOpacity = 0.85
     @AppStorage("warningThreshold") private var warningThreshold = 180
     @AppStorage("warningSound") private var warningSound = "Glass"
     @AppStorage("finishSound") private var finishSound = "Hero"
@@ -25,6 +26,11 @@ struct SettingsSheet: View {
 
             // Theme toggle
             themeSection
+
+            Divider()
+
+            // Opacity
+            opacitySection
 
             Divider()
 
@@ -167,6 +173,43 @@ struct SettingsSheet: View {
                     .buttonStyle(.plain)
                     .help("Прослушать")
                 }
+            }
+        }
+    }
+
+    // MARK: - Opacity Section
+
+    private var opacitySection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Прозрачность")
+                    .font(.system(size: 13))
+
+                Spacer()
+
+                Text("\(Int(panelOpacity * 100))%")
+                    .font(.system(size: 13, weight: .medium, design: .monospaced))
+                    .foregroundStyle(.cyan)
+            }
+
+            Slider(value: $panelOpacity, in: 0.3...1.0, step: 0.05)
+                .tint(.cyan)
+                .onChange(of: panelOpacity) { _, newValue in
+                    NotificationCenter.default.post(
+                        name: .panelOpacityChanged,
+                        object: nil,
+                        userInfo: ["opacity": newValue]
+                    )
+                }
+
+            HStack {
+                Text("30%")
+                    .font(.system(size: 10))
+                    .foregroundStyle(.tertiary)
+                Spacer()
+                Text("100%")
+                    .font(.system(size: 10))
+                    .foregroundStyle(.tertiary)
             }
         }
     }
