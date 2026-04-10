@@ -58,28 +58,12 @@ struct MainView: View {
         )
         .contentShape(Rectangle())
         .onTapGesture {
-            if viewModel.timers.isEmpty {
-                viewModel.expandedScreen = .addTimer
-            } else {
+            // Tap toggles to expanded timer list (shows full controls)
+            if viewModel.hasTimers {
                 viewModel.expandedScreen = .list
-            }
-            viewModel.isExpanded = true
-            requestResize()
-        }
-        .contextMenu {
-            Button("Добавить таймер") {
-                viewModel.expandedScreen = .addTimer
                 viewModel.isExpanded = true
                 requestResize()
             }
-            Divider()
-            Button("Настройки") {
-                viewModel.expandedScreen = .settings
-                viewModel.isExpanded = true
-                requestResize()
-            }
-            Divider()
-            Button("Выход") { NSApp.terminate(nil) }
         }
     }
 
@@ -100,22 +84,52 @@ struct MainView: View {
 
     private var expandedView: some View {
         VStack(spacing: 0) {
-            // Header
-            expandedHeader
-
-            Divider().opacity(0.15)
-
-            // Content
             switch viewModel.expandedScreen {
             case .list:
                 expandedTimerList
             case .addTimer:
+                HStack {
+                    Spacer()
+                    Button {
+                        viewModel.isExpanded = viewModel.hasTimers
+                        viewModel.expandedScreen = .list
+                        requestResize()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 9, weight: .bold))
+                            .foregroundStyle(.secondary)
+                            .frame(width: 20, height: 20)
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(.trailing, 6)
+                .padding(.top, 4)
+
                 AddTimerSheet(viewModel: viewModel) {
+                    viewModel.isExpanded = viewModel.hasTimers
                     viewModel.expandedScreen = .list
                     requestResize()
                 }
             case .settings:
+                HStack {
+                    Spacer()
+                    Button {
+                        viewModel.isExpanded = viewModel.hasTimers
+                        viewModel.expandedScreen = .list
+                        requestResize()
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 9, weight: .bold))
+                            .foregroundStyle(.secondary)
+                            .frame(width: 20, height: 20)
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(.trailing, 6)
+                .padding(.top, 4)
+
                 SettingsSheet {
+                    viewModel.isExpanded = viewModel.hasTimers
                     viewModel.expandedScreen = .list
                     requestResize()
                 }
@@ -130,97 +144,23 @@ struct MainView: View {
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 
-    private var expandedHeader: some View {
-        HStack(spacing: 6) {
-            Button {
-                viewModel.isExpanded = false
-                viewModel.expandedScreen = .list
-            } label: {
-                Image(systemName: "chevron.down")
-                    .font(.system(size: 9, weight: .bold))
-                    .foregroundStyle(.secondary)
-            }
-            .buttonStyle(.plain)
-            .help("Свернуть")
-
-            Text("Boost Timer")
-                .font(.system(size: 11, weight: .semibold))
-                .foregroundStyle(.secondary)
-
-            Spacer()
-
-            if viewModel.expandedScreen == .list {
-                Button {
-                    viewModel.expandedScreen = .settings
-                    requestResize()
-                } label: {
-                    Image(systemName: "gearshape")
-                        .font(.system(size: 10))
-                        .foregroundStyle(.secondary)
-                }
-                .buttonStyle(.plain)
-            } else {
-                Button {
-                    viewModel.expandedScreen = .list
-                    requestResize()
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundStyle(.secondary)
-                }
-                .buttonStyle(.plain)
-            }
-        }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 7)
-    }
-
     private var expandedTimerList: some View {
-        VStack(spacing: 0) {
-            if viewModel.hasTimers {
-                ScrollView {
-                    LazyVStack(spacing: 6) {
-                        ForEach(viewModel.timers) { timer in
-                            TimerRowView(timer: timer) {
-                                withAnimation(.easeInOut(duration: 0.2)) {
-                                    viewModel.removeTimer(timer)
-                                    requestResize()
-                                }
+        ScrollView {
+            LazyVStack(spacing: 6) {
+                ForEach(viewModel.timers) { timer in
+                    TimerRowView(timer: timer) {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            viewModel.removeTimer(timer)
+                            if !viewModel.hasTimers {
+                                viewModel.isExpanded = false
                             }
+                            requestResize()
                         }
                     }
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 6)
                 }
-            } else {
-                VStack(spacing: 6) {
-                    Image(systemName: "timer")
-                        .font(.system(size: 22, weight: .ultraLight))
-                        .foregroundStyle(.tertiary)
-                    Text("Нет таймеров")
-                        .font(.system(size: 11))
-                        .foregroundStyle(.tertiary)
-                }
-                .frame(maxWidth: .infinity, minHeight: 60)
             }
-
-            // Add button
-            Button {
-                viewModel.expandedScreen = .addTimer
-                requestResize()
-            } label: {
-                HStack(spacing: 4) {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 11))
-                    Text("Добавить")
-                        .font(.system(size: 11, weight: .medium))
-                }
-                .foregroundStyle(.cyan)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 7)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 6)
         }
     }
 
