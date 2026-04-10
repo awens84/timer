@@ -52,7 +52,7 @@ struct MainView: View {
         .padding(.vertical, 4)
         .background(
             RoundedRectangle(cornerRadius: 8)
-                .fill(.thickMaterial)
+                .fill(.thinMaterial)
                 .shadow(color: .black.opacity(0.3), radius: 4, y: 2)
         )
         .contentShape(Rectangle())
@@ -123,7 +123,7 @@ struct MainView: View {
         .frame(width: 250)
         .background(
             RoundedRectangle(cornerRadius: 10)
-                .fill(.thickMaterial)
+                .fill(.thinMaterial)
                 .shadow(color: .black.opacity(0.3), radius: 6, y: 3)
         )
         .clipShape(RoundedRectangle(cornerRadius: 10))
