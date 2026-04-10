@@ -52,7 +52,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if let screen = NSScreen.main {
             let sf = screen.visibleFrame
             let x = sf.maxX - 90
-            let y = sf.minY + 20
+            let y = sf.minY + 50
             panel.setFrameOrigin(NSPoint(x: x, y: y))
         }
 
