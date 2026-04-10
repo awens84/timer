@@ -20,10 +20,102 @@ class FloatingPanel: NSPanel {
 class AppDelegate: NSObject, NSApplicationDelegate {
     private var panel: FloatingPanel!
     private var viewModel = TimerListViewModel()
+    private var statusItem: NSStatusItem!
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NotificationService.shared.requestPermission()
 
+        setupStatusBar()
+        setupPanel()
+
+        // Listen for resize requests from SwiftUI views
+        NotificationCenter.default.addObserver(
+            forName: .panelResize,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let size = notification.userInfo?["size"] as? NSSize else { return }
+            self?.resizePanel(to: size)
+        }
+    }
+
+    // MARK: - Status Bar
+
+    private func setupStatusBar() {
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+
+        if let button = statusItem.button {
+            button.image = NSImage(systemSymbolName: "bolt.fill", accessibilityDescription: "Boost Timer")
+            button.image?.size = NSSize(width: 14, height: 14)
+            button.action = #selector(statusBarClicked)
+            button.target = self
+            // Right-click sends same action on macOS, we'll use a menu for right-click
+            button.sendAction(on: [.leftMouseUp, .rightMouseUp])
+        }
+    }
+
+    @objc private func statusBarClicked(_ sender: NSStatusBarButton) {
+        guard let event = NSApp.currentEvent else { return }
+
+        if event.type == .rightMouseUp {
+            // Right-click: show context menu
+            let menu = NSMenu()
+            menu.addItem(NSMenuItem(title: "Показать/Скрыть", action: #selector(togglePanel), keyEquivalent: ""))
+            menu.addItem(.separator())
+            menu.addItem(NSMenuItem(title: "Добавить таймер", action: #selector(addTimer), keyEquivalent: "n"))
+            menu.addItem(NSMenuItem(title: "Настройки", action: #selector(openSettings), keyEquivalent: ","))
+            menu.addItem(.separator())
+            menu.addItem(NSMenuItem(title: "Выход", action: #selector(quitApp), keyEquivalent: "q"))
+            statusItem.menu = menu
+            statusItem.button?.performClick(nil)
+            // Reset menu so left-click works again
+            DispatchQueue.main.async { [weak self] in
+                self?.statusItem.menu = nil
+            }
+        } else {
+            // Left-click: toggle panel visibility
+            togglePanel()
+        }
+    }
+
+    @objc private func togglePanel() {
+        if panel.isVisible {
+            panel.orderOut(nil)
+        } else {
+            panel.orderFrontRegardless()
+        }
+    }
+
+    @objc private func addTimer() {
+        viewModel.expandedScreen = .addTimer
+        viewModel.isExpanded = true
+        panel.orderFrontRegardless()
+        // Trigger resize
+        NotificationCenter.default.post(
+            name: .panelResize,
+            object: nil,
+            userInfo: ["size": NSSize(width: 250, height: 340)]
+        )
+    }
+
+    @objc private func openSettings() {
+        viewModel.expandedScreen = .settings
+        viewModel.isExpanded = true
+        panel.orderFrontRegardless()
+        NotificationCenter.default.post(
+            name: .panelResize,
+            object: nil,
+            userInfo: ["size": NSSize(width: 250, height: 400)]
+        )
+    }
+
+    @objc private func quitApp() {
+        NSApp.terminate(nil)
+    }
+
+    // MARK: - Panel Setup
+
+    private func setupPanel() {
         let contentView = MainView(viewModel: viewModel)
 
         // Create borderless floating panel — small, no chrome
@@ -57,16 +149,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         panel.orderFrontRegardless()
-
-        // Listen for resize requests from SwiftUI views
-        NotificationCenter.default.addObserver(
-            forName: .panelResize,
-            object: nil,
-            queue: .main
-        ) { [weak self] notification in
-            guard let size = notification.userInfo?["size"] as? NSSize else { return }
-            self?.resizePanel(to: size)
-        }
     }
 
     /// Resize panel keeping bottom-right corner anchored
