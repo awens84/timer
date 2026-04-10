@@ -119,7 +119,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NotificationCenter.default.post(
             name: .panelResize,
             object: nil,
-            userInfo: ["size": NSSize(width: 200, height: 430)]
+            userInfo: ["size": NSSize(width: 200, height: 490)]
         )
     }
 

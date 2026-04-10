@@ -177,7 +177,7 @@ struct MainView: View {
                 case .addTimer:
                     size = NSSize(width: 200, height: 310)
                 case .settings:
-                    size = NSSize(width: 200, height: 430)
+                    size = NSSize(width: 200, height: 490)
                 }
             } else {
                 if viewModel.timers.isEmpty {
