@@ -10,18 +10,18 @@ struct TimerRowView: View {
     // MARK: - Body
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 4) {
             // Name + delete button
             nameRow
 
-            // Large timer display
+            // Timer display
             timerDisplay
 
             // Progress bar + controls
             controlsRow
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 6)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
         .background { cardBackground }
         .onHover { isHovering = $0 }
         .onChange(of: timer.state) { oldState, newState in
@@ -65,7 +65,7 @@ struct TimerRowView: View {
 
     private var timerDisplay: some View {
         Text(timer.displayTime)
-            .font(.system(size: 26, weight: .ultraLight, design: .monospaced))
+            .font(.system(size: 20, weight: .light, design: .monospaced))
             .foregroundStyle(timer.state.color)
             .contentTransition(.numericText())
             .animation(.linear(duration: 0.1), value: timer.remainingSeconds)
@@ -78,31 +78,27 @@ struct TimerRowView: View {
     // MARK: - Controls Row
 
     private var controlsRow: some View {
-        HStack(spacing: 8) {
-            // Progress bar
+        HStack(spacing: 6) {
             progressBar
 
             Spacer()
 
-            // Control buttons
-            HStack(spacing: 2) {
-                // Play / Pause / Restart
+            HStack(spacing: 0) {
                 Button(action: { timer.toggleStartPause() }) {
                     Image(systemName: playPauseIcon)
-                        .font(.system(size: 11, weight: .medium))
+                        .font(.system(size: 10, weight: .medium))
                         .foregroundStyle(timer.state.color)
-                        .frame(width: 24, height: 24)
+                        .frame(width: 20, height: 20)
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .help(playPauseTooltip)
 
-                // Reset
                 Button(action: { timer.reset() }) {
                     Image(systemName: "arrow.counterclockwise")
-                        .font(.system(size: 10))
+                        .font(.system(size: 9))
                         .foregroundStyle(.secondary)
-                        .frame(width: 24, height: 24)
+                        .frame(width: 20, height: 20)
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
@@ -129,7 +125,7 @@ struct TimerRowView: View {
                     .animation(.linear(duration: 0.3), value: timer.progress)
             }
         }
-        .frame(height: 4)
+        .frame(height: 3)
     }
 
     // MARK: - Card Background

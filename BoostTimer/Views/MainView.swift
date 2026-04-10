@@ -135,7 +135,7 @@ struct MainView: View {
                 }
             }
         }
-        .frame(width: 250)
+        .frame(width: 200)
         .background(
             RoundedRectangle(cornerRadius: 10)
                 .fill(.thinMaterial)
@@ -159,8 +159,8 @@ struct MainView: View {
                     }
                 }
             }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 6)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 4)
         }
     }
 
@@ -172,12 +172,12 @@ struct MainView: View {
             if viewModel.isExpanded {
                 switch viewModel.expandedScreen {
                 case .list:
-                    let h = max(140, viewModel.timers.count * 80 + 80)
-                    size = NSSize(width: 250, height: min(CGFloat(h), 380))
+                    let h = viewModel.timers.count * 64 + 12
+                    size = NSSize(width: 200, height: min(CGFloat(h), 300))
                 case .addTimer:
-                    size = NSSize(width: 250, height: 340)
+                    size = NSSize(width: 200, height: 310)
                 case .settings:
-                    size = NSSize(width: 250, height: 460)
+                    size = NSSize(width: 200, height: 430)
                 }
             } else {
                 if viewModel.timers.isEmpty {
