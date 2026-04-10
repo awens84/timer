@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct SettingsSheet: View {
-    @Environment(\.dismiss) private var dismiss
+    var onDismiss: () -> Void
 
     @AppStorage("isDarkMode") private var isDarkMode = true
     @AppStorage("warningThreshold") private var warningThreshold = 180
@@ -40,14 +40,13 @@ struct SettingsSheet: View {
 
             // Done button
             Button("Готово") {
-                dismiss()
+                onDismiss()
             }
             .keyboardShortcut(.defaultAction)
             .buttonStyle(.borderedProminent)
             .tint(.cyan)
         }
-        .padding(20)
-        .frame(width: 280)
+        .padding(12)
     }
 
     // MARK: - Theme Section

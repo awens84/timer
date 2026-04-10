@@ -4,8 +4,8 @@ import Observation
 @Observable
 class TimerListViewModel {
     var timers: [TimerItem] = []
-    var showingAddSheet = false
-    var showingSettings = false
+    var isExpanded = false
+    var expandedScreen: ExpandedScreen = .list
 
     // MARK: - Timer Management
 

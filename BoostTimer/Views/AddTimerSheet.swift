@@ -2,7 +2,7 @@ import SwiftUI
 
 struct AddTimerSheet: View {
     let viewModel: TimerListViewModel
-    @Environment(\.dismiss) private var dismiss
+    var onDismiss: () -> Void
 
     @State private var name: String = ""
     @State private var minutes: Int = 5
@@ -112,7 +112,7 @@ struct AddTimerSheet: View {
             // Action buttons
             HStack {
                 Button("Отмена") {
-                    dismiss()
+                    onDismiss()
                 }
                 .keyboardShortcut(.cancelAction)
 
@@ -127,8 +127,7 @@ struct AddTimerSheet: View {
                 .tint(.cyan)
             }
         }
-        .padding(20)
-        .frame(width: 300)
+        .padding(12)
     }
 
     // MARK: - Helpers
@@ -146,7 +145,7 @@ struct AddTimerSheet: View {
             name: timerName.isEmpty ? "Таймер" : timerName,
             seconds: totalSeconds
         )
-        dismiss()
+        onDismiss()
     }
 }
 

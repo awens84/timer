@@ -3,9 +3,8 @@ import SwiftUI
 
 // MARK: - Custom Floating Panel
 
-/// NSPanel subclass that accepts first mouse click without requiring activation.
-/// This ensures buttons in the floating panel work on the first click,
-/// even when another application is focused.
+/// Borderless NSPanel subclass for the micro timer pill.
+/// No title bar, no window buttons — just the SwiftUI content.
 class FloatingPanel: NSPanel {
     override var canBecomeKey: Bool { true }
     override var canBecomeMain: Bool { false }
@@ -13,11 +12,6 @@ class FloatingPanel: NSPanel {
     override func resignKey() {
         super.resignKey()
         level = .floating
-    }
-
-    // Send mouse events directly without requiring activation first
-    override func sendEvent(_ event: NSEvent) {
-        super.sendEvent(event)
     }
 }
 
@@ -28,73 +22,70 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var viewModel = TimerListViewModel()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // Request notification permissions
         NotificationService.shared.requestPermission()
 
-        // Create the SwiftUI content view
         let contentView = MainView(viewModel: viewModel)
 
-        // Create floating panel
+        // Create borderless floating panel — small, no chrome
         panel = FloatingPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 300, height: 420),
-            styleMask: [
-                .titled,
-                .closable,
-                .miniaturizable,
-                .resizable,
-                .nonactivatingPanel,
-                .fullSizeContentView
-            ],
+            contentRect: NSRect(x: 0, y: 0, width: 64, height: 28),
+            styleMask: [.borderless, .nonactivatingPanel],
             backing: .buffered,
             defer: false
         )
 
-        // Panel configuration
+        // Panel behavior
         panel.level = .floating
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         panel.isOpaque = false
         panel.backgroundColor = .clear
-        panel.titlebarAppearsTransparent = true
-        panel.titleVisibility = .hidden
-        panel.isMovableByWindowBackground = true
-        panel.hasShadow = true
-
-        // Keep visible when app loses focus (critical for always-on-top behavior)
-        panel.hidesOnDeactivate = false
+        panel.hasShadow = false            // SwiftUI handles shadows
+        panel.hidesOnDeactivate = false    // Stay visible when app loses focus
         panel.becomesKeyOnlyIfNeeded = true
-
-        // Size constraints
-        panel.minSize = NSSize(width: 260, height: 200)
-        panel.maxSize = NSSize(width: 400, height: 800)
+        panel.isMovableByWindowBackground = true
 
         // Set SwiftUI content
         let hostingView = NSHostingView(rootView: contentView)
         panel.contentView = hostingView
 
-        // Position at top-right of screen
+        // Position at bottom-right of screen
         if let screen = NSScreen.main {
-            let screenFrame = screen.visibleFrame
-            let x = screenFrame.maxX - 320
-            let y = screenFrame.maxY - 440
+            let sf = screen.visibleFrame
+            let x = sf.maxX - 90
+            let y = sf.minY + 20
             panel.setFrameOrigin(NSPoint(x: x, y: y))
         }
 
-        panel.makeKeyAndOrderFront(nil)
+        panel.orderFrontRegardless()
 
-        // Quit app only when the main panel is closed (not when sheets are dismissed)
+        // Listen for resize requests from SwiftUI views
         NotificationCenter.default.addObserver(
-            forName: NSWindow.willCloseNotification,
-            object: panel,
+            forName: .panelResize,
+            object: nil,
             queue: .main
-        ) { _ in
-            NSApp.terminate(nil)
+        ) { [weak self] notification in
+            guard let size = notification.userInfo?["size"] as? NSSize else { return }
+            self?.resizePanel(to: size)
+        }
+    }
+
+    /// Resize panel keeping bottom-right corner anchored
+    private func resizePanel(to size: NSSize) {
+        let current = panel.frame
+        let newFrame = NSRect(
+            x: current.maxX - size.width,   // Keep right edge
+            y: current.origin.y,             // Keep bottom edge
+            width: size.width,
+            height: size.height
+        )
+        NSAnimationContext.runAnimationGroup { ctx in
+            ctx.duration = 0.2
+            ctx.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            panel.animator().setFrame(newFrame, display: true)
         }
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        // Return false — we handle quit manually via willCloseNotification on the panel.
-        // Returning true here causes the app to quit when SwiftUI sheets are dismissed,
-        // because macOS counts sheet dismissal as "last window closed".
         return false
     }
 }
