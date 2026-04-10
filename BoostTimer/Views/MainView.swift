@@ -242,7 +242,7 @@ struct MainView: View {
                     let h = max(150, viewModel.timers.count * 90 + 75)
                     size = NSSize(width: 250, height: min(CGFloat(h), 380))
                 case .addTimer:
-                    size = NSSize(width: 250, height: 320)
+                    size = NSSize(width: 250, height: 340)
                 case .settings:
                     size = NSSize(width: 250, height: 340)
                 }

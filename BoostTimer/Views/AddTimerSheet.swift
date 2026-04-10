@@ -10,12 +10,8 @@ struct AddTimerSheet: View {
 
     // Presets: (label, seconds)
     private let presets: [(String, Int)] = [
-        ("1m", 60),
         ("3m", 180),
         ("5m", 300),
-        ("10m", 600),
-        ("15m", 900),
-        ("25m", 1500),
         ("30m", 1800),
     ]
 
@@ -45,7 +41,7 @@ struct AddTimerSheet: View {
                     .foregroundStyle(.secondary)
 
                 LazyVGrid(
-                    columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: 4),
+                    columns: Array(repeating: GridItem(.flexible(), spacing: 6), count: 3),
                     spacing: 6
                 ) {
                     ForEach(presets, id: \.1) { preset in
