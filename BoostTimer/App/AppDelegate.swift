@@ -80,9 +80,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         panel.makeKeyAndOrderFront(nil)
+
+        // Quit app only when the main panel is closed (not when sheets are dismissed)
+        NotificationCenter.default.addObserver(
+            forName: NSWindow.willCloseNotification,
+            object: panel,
+            queue: .main
+        ) { _ in
+            NSApp.terminate(nil)
+        }
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        return true
+        // Return false — we handle quit manually via willCloseNotification on the panel.
+        // Returning true here causes the app to quit when SwiftUI sheets are dismissed,
+        // because macOS counts sheet dismissal as "last window closed".
+        return false
     }
 }
