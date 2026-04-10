@@ -20,7 +20,8 @@ struct TimerRowView: View {
             // Progress bar + controls
             controlsRow
         }
-        .padding(12)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
         .background { cardBackground }
         .onHover { isHovering = $0 }
         .onChange(of: timer.state) { oldState, newState in
@@ -64,7 +65,7 @@ struct TimerRowView: View {
 
     private var timerDisplay: some View {
         Text(timer.displayTime)
-            .font(.system(size: 40, weight: .ultraLight, design: .monospaced))
+            .font(.system(size: 26, weight: .ultraLight, design: .monospaced))
             .foregroundStyle(timer.state.color)
             .contentTransition(.numericText())
             .animation(.linear(duration: 0.1), value: timer.remainingSeconds)
@@ -88,9 +89,9 @@ struct TimerRowView: View {
                 // Play / Pause / Restart
                 Button(action: { timer.toggleStartPause() }) {
                     Image(systemName: playPauseIcon)
-                        .font(.system(size: 12, weight: .medium))
+                        .font(.system(size: 11, weight: .medium))
                         .foregroundStyle(timer.state.color)
-                        .frame(width: 28, height: 28)
+                        .frame(width: 24, height: 24)
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
@@ -99,9 +100,9 @@ struct TimerRowView: View {
                 // Reset
                 Button(action: { timer.reset() }) {
                     Image(systemName: "arrow.counterclockwise")
-                        .font(.system(size: 11))
+                        .font(.system(size: 10))
                         .foregroundStyle(.secondary)
-                        .frame(width: 28, height: 28)
+                        .frame(width: 24, height: 24)
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
@@ -135,28 +136,21 @@ struct TimerRowView: View {
 
     private var cardBackground: some View {
         ZStack {
-            // Base material
-            RoundedRectangle(cornerRadius: 10)
-                .fill(.ultraThinMaterial)
-
-            // Alert glow overlay
+            // Alert glow overlay only — no border for normal state
             if timer.state.isAlert {
-                RoundedRectangle(cornerRadius: 10)
+                RoundedRectangle(cornerRadius: 8)
                     .fill(timer.state.color.opacity(0.05 + pulseOpacity * 0.08))
 
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(timer.state.color.opacity(0.3 + pulseOpacity * 0.3), lineWidth: 1)
-            } else {
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color.gray.opacity(0.15), lineWidth: 0.5)
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(timer.state.color.opacity(0.2 + pulseOpacity * 0.2), lineWidth: 0.5)
             }
         }
         .shadow(
             color: timer.state.isAlert
-                ? timer.state.color.opacity(0.15 + pulseOpacity * 0.15)
-                : Color.black.opacity(0.1),
-            radius: timer.state.isAlert ? 10 : 4,
-            y: 2
+                ? timer.state.color.opacity(0.1 + pulseOpacity * 0.1)
+                : .clear,
+            radius: timer.state.isAlert ? 6 : 0,
+            y: 1
         )
     }
 

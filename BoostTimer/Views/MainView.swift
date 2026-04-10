@@ -52,12 +52,8 @@ struct MainView: View {
         .padding(.vertical, 4)
         .background(
             RoundedRectangle(cornerRadius: 8)
-                .fill(Color(white: 0.12))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.white.opacity(0.06), lineWidth: 0.5)
-                )
-                .shadow(color: .black.opacity(0.5), radius: 6, y: 2)
+                .fill(.ultraThinMaterial)
+                .shadow(color: .black.opacity(0.3), radius: 4, y: 2)
         )
         .contentShape(Rectangle())
         .onTapGesture {
@@ -127,12 +123,8 @@ struct MainView: View {
         .frame(width: 250)
         .background(
             RoundedRectangle(cornerRadius: 10)
-                .fill(Color(white: 0.12))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.white.opacity(0.06), lineWidth: 0.5)
-                )
-                .shadow(color: .black.opacity(0.5), radius: 8, y: 3)
+                .fill(.ultraThinMaterial)
+                .shadow(color: .black.opacity(0.3), radius: 6, y: 3)
         )
         .clipShape(RoundedRectangle(cornerRadius: 10))
     }
@@ -239,8 +231,8 @@ struct MainView: View {
             if viewModel.isExpanded {
                 switch viewModel.expandedScreen {
                 case .list:
-                    let h = max(150, viewModel.timers.count * 90 + 75)
-                    size = NSSize(width: 250, height: min(CGFloat(h), 380))
+                    let h = max(130, viewModel.timers.count * 70 + 70)
+                    size = NSSize(width: 250, height: min(CGFloat(h), 350))
                 case .addTimer:
                     size = NSSize(width: 250, height: 340)
                 case .settings:
